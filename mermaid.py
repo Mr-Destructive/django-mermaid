@@ -6,6 +6,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"{project_name}.settings")
 django.setup()
 
 models_list = apps.get_models()
+model_file = f"{project_name}_model.md"
 models_data = []
 relations = []
 
@@ -18,7 +19,8 @@ for model in models_list:
     model_dict[model.__name__] = model_fields
     models_data.append(model_dict)
 
-with open('models.md', 'w') as f:
+with open(model_file, 'w') as f:
+    f.write(f"## {project_name}'s ER Diagram\n\n```mermaid\n")
     f.write("erDiagram\n")
     for model in models_data:
         for model_name in model:
@@ -42,4 +44,6 @@ with open('models.md', 'w') as f:
                     f.write(f"{field_type} {field_name}\n")
             f.write("}\n")
     f.writelines(relations)
+    f.write("```\n")
+    print(f"ER Diagram for {project_name} generated in the file -> {model_file}")
 
