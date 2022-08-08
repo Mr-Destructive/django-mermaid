@@ -1,15 +1,29 @@
 import os, django
 from django.apps import apps
 import sys
+
 project_name = sys.argv[1]
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"{project_name}.settings")
 django.setup()
+
 
 models_list = apps.get_models()
 model_file = f"{project_name}_model.md"
 models_data = []
 relations = []
 
+try:
+    from django.conf import settings
+    if settings.APP_EXCLUDE:
+        for app in settings.APP_EXCLUDE:
+            models = apps.get_app_config(app).models
+            for model in models:
+                if models[model] in models_list:
+                    models_list.remove(models[model])
+except Exception as e:
+    print("There was a error in loading the models/app to exclude")
+    pass
+        
 for model in models_list:
     model_dict = {}
     model_fields = []
@@ -30,7 +44,7 @@ with open(model_file, 'w') as f:
                 field_type = field.get_internal_type()
                 field_name = field.name
 
-                if field.related_model:
+                if field.related_model and field.related_model in models_list:
                     field_related_model = field.related_model.__name__
                     field_model = field.model.__name__
                     if field_type == 'ForeignKey':
