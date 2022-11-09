@@ -1,19 +1,28 @@
-import os, django
-from django.apps import apps
+import os
 import sys
 
-def generate_md_file():
-    project_name = sys.argv[1]
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"{project_name}.settings")
+def generate_md_file(project_name):
+
+    import sys, os
+    sys.path.append(project_name)
+    os.environ['DJANGO_SETTINGS_MODULE'] = f'{project_name}.settings'
+    from django.conf import settings
+    import django
     django.setup()
+    #os.environ.setdefault("DJANGO_SETTINGS_MODULE", f"{project_name}.settings")
+    #project_settings_mod = f"{project_name}.settings"
+    #project_settings = __import__(project_settings_mod)
+    #settings.configure(default_settings=project_settings, DEBUG=True)
 
-
+    #django.setup()
+    from django.apps import apps
     models_list = apps.get_models()
     model_file = f"{project_name}_model.md"
     models_data = []
     relations = []
 
     try:
+        from django.apps import apps
         from django.conf import settings
         if settings.APP_EXCLUDE:
             for app in settings.APP_EXCLUDE:
