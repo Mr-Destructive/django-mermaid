@@ -3,7 +3,6 @@ import sys
 
 def generate_md_file(project_name):
 
-    import sys, os
     sys.path.append(project_name)
     os.environ['DJANGO_SETTINGS_MODULE'] = f'{project_name}.settings'
     from django.conf import settings
@@ -71,3 +70,28 @@ def generate_md_file(project_name):
         f.write("```\n")
         print(f"ER Diagram for {project_name} generated in the file -> {model_file}")
 
+def generate_model_file(project_name, mermaid_diagram):
+    sys.path.append(project_name)
+    os.environ['DJANGO_SETTINGS_MODULE'] = f'{project_name}.settings'
+    from django.conf import settings
+    from django import models
+    import django
+    django.setup()
+    model_dict = {}
+
+    lines = mermaid_diagram.split("\n")
+
+    for line in lines:
+        if line.startswith("class"):
+            field_name = line.split(" ")[1].strip()
+
+            if "<< (E,red) >>" in line:
+                field_type = models.ForeignKey
+            else:
+                field_type = models.CharField
+
+            model_dict[field_name] = field_type
+
+    model = type(str(model_dict.keys()[0]), (models.Model,), model_dict)
+
+    return model

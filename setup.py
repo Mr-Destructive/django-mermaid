@@ -28,5 +28,10 @@ setup(
     url=URL,
     install_requires=INSTALL_REQUIRES,
     packages=find_packages(),
-    entry_points={"console_scripts": ["djmaid= django_mermaid.app:main"]},
+    entry_points={"console_scripts": 
+        [
+            "djmaid = django_mermaid.app:main",
+            "maidj = django_mermaid.app:generate_model",
+        ]
+    },
 )
